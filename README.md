@@ -1,16 +1,15 @@
 # Notion game database
 
-This template should help get you started developing with Vue 3 in Vite.
+[![https://imgur.com/ubzY4G7.jpg](https://imgur.com/ubzY4G7.jpg)](https://imgur.com/ubzY4G7.jpg)
 
-## Recommended IDE Setup
+Since there are so many game launchers now a days and it's hard to keep track on what you own where. That is why I keep my game database in Notion. I was missing a lot images, so I connected the IGDB database to the Notion API. If you launch the site it will list all your games without an cover at the left most column and when you click a game it will load 5 images from the IGDB when you select one it will set it as the cover in Notion and load the next game. 
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.vscode-typescript-vue-plugin).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
+This is a simple website that gives you a UI to work with the two APIs, it's quickly setup with no fancy featues, but hopefully it will help someone.
 ## Project Setup
+### Launch chrome with CORS disabled
+```sh
+open -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --args --user-data-dir="/tmp/chrome_dev_sess_1" --disable-web-security
+```
 
 ```sh
 npm install
@@ -27,3 +26,19 @@ npm run dev
 ```sh
 npm run build
 ```
+
+
+### `secrets.json`
+Rename `secrets-example.json` and update with your own credentials
+```json
+{
+  "notion": {
+    "token": "NOTION_SECRET",
+    "databaseId": "DATABASE_ID"
+  },
+  "igdb": {
+    "clientID": "CLIENT_ID",
+    "token": "TOKEN"
+  }
+}
+``

@@ -8,23 +8,62 @@ export default {
       id: null,
       covers: null,
       currentId: null,
+      access_token: "",
     };
   },
   methods: {
     searchIgdb(id) {
+      this.currentId = id;
+
       const clientID = secrets.igdb.clientID;
       const token = secrets.igdb.token;
+      let access_token;
+      // api call
+      let myHeadersaccess_token = new Headers();
+      // myHeaders.append("", clientID);
+      myHeadersaccess_token.append("Client-ID", clientID);
+      myHeadersaccess_token.append("Authorization", `Bearer ${token}`);
+      myHeadersaccess_token.append("Content-Type", "text/plain");
+
+      var requestOptions = {
+        method: "POST",
+        headers: myHeadersaccess_token,
+        redirect: "follow",
+        // body: data,
+      };
+      // Get access_token
+      fetch(
+        `https://id.twitch.tv/oauth2/token?client_id=${clientID}&client_secret=${token}&grant_type=client_credentials`,
+        requestOptions,
+      )
+        .then((response) => response.text())
+        .then((result) => {
+          const t = JSON.parse(result).access_token;
+          console.warn(result);
+          console.warn(t);
+          this.access_token = t;
+
+          this.getGames(id);
+        })
+        .catch((error) => console.log("error", error));
+
+
+    },
+    getGames(id) {
       let url = `https://api.igdb.com/v4/games/`;
       this.currentId = id;
+
       const game = this.results.find((item) => item.id === id).properties.Name
         .title[0].plain_text;
+      const data = `search "${game}"; limit 5; fields name,cover.*;`;
 
-      const data = `search "${game}"; limit 5; fields name,cover.*;"`;
+      const clientID = secrets.igdb.clientID;
+      console.warn(this.access_token);
+      // api call
       let myHeaders = new Headers();
-      // myHeaders.append("", clientID);
       myHeaders.append("Client-ID", clientID);
-      myHeaders.append("Authorization", `Bearer ${token}`);
-      myHeaders.append("Content-Type", "text/plain");
+      myHeaders.append("Authorization", `Bearer ${this.access_token}`);
+      // myHeaders.append("Content-Type", "text/plain");
 
       var requestOptions = {
         method: "POST",
@@ -32,11 +71,12 @@ export default {
         redirect: "follow",
         body: data,
       };
-
       fetch(url, requestOptions)
         .then((response) => response.text())
         .then((result) => {
+          console.warn(result);
           this.covers = JSON.parse(result);
+          // console.warn(result);
         })
         .catch((error) => console.log("error", error));
     },
@@ -149,8 +189,8 @@ export default {
   <main>
     <div class="games">
       <div class="item" v-for="(item) in results" :key="item.id">
-        <h3>{{item.properties.Name.title[0].plain_text}}</h3>
-        {{item.id}}
+        <h3>{{ item.properties.Name.title[0].plain_text }}</h3>
+        {{ item.id }}
         <button @click="searchIgdb(item.id)">Search cover</button>
       </div>
     </div>
@@ -169,17 +209,21 @@ main {
   display: flex;
   min-height: 100vh;
 }
-main > * {
+
+main>* {
   flex-basis: 100%;
 }
+
 .games {
   max-width: 500px;
   height: 100vh;
   overflow-y: scroll;
 }
+
 .games .item {
   background-color: rgba(0, 0, 0, 0.6);
 }
+
 .cover {
   max-width: 400px;
   height: 100vh;
